@@ -8,8 +8,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     sudo \
     build-essential \
-    cmake \
-    ninja-build \
     git \
     curl \
     wget \
@@ -66,8 +64,9 @@ RUN ./qt-installer.run \
     install qt.qt6.680.linux_gcc_64
 
 # Set up environment variables
+ENV QT_PATH=/opt/Qt/6.8.0
 ENV QT_BASE_DIR=/opt/Qt/6.8.0/gcc_64
-ENV PATH=$QT_BASE_DIR/bin:$PATH
+ENV PATH=$PATH:$QT_BASE_DIR/bin:$QT_PATH/Tools/CMake/bin:$QT_PATH/Tools/Ninja
 ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib
 ENV QML2_IMPORT_PATH=$QT_BASE_DIR/qml
 ENV QT_PLUGIN_PATH=$QT_BASE_DIR/plugins

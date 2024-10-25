@@ -65,22 +65,28 @@ RUN ./qt-installer.run \
     install qt.qt6.680.wasm_multithread
 
 # Set up environment variables
+ENV QT_PATH=/opt/Qt/6.8.0
 ENV QT_BASE_DIR=/opt/Qt/6.8.0/wasm_multithread
-ENV PATH=$QT_BASE_DIR/bin:$PATH
+ENV PATH=$PATH:$QT_BASE_DIR/bin:$QT_PATH/Tools/CMake/bin:$QT_PATH/Tools/Ninja
 ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib
 ENV QML2_IMPORT_PATH=$QT_BASE_DIR/qml
 ENV QT_PLUGIN_PATH=$QT_BASE_DIR/plugins
+ENV CMAKE_C_COMPILER=/opt/emsdk/upstream/emscripten/emcc
+ENV CMAKE_CXX_COMPILER=/opt/emsdk/upstream/emscripten/em++
+ENV CMAKE_TOOLCHAIN_FILE=$QT_BASE_DIR/lib/cmake/Qt6/qt.toolchain.cmake
 
 # Set environment variables for WebAssembly
 ENV EMSDK_VERSION=3.1.56
 ENV EMSDK_PATH=/opt/emsdk
-ENV PATH="${EMSDK_PATH}/upstream/emscripten:${EMSDK_PATH}/upstream/bin:${EMSDK_PATH}/node/bin:${EMSDK_PATH}/python/3.9.2_64bit/bin:$PATH"
 
 # Install emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_PATH && \
     cd $EMSDK_PATH && \
     ./emsdk install $EMSDK_VERSION && \
     ./emsdk activate $EMSDK_VERSION
+
+# Set up the environment variables permanently in the shell
+RUN echo "source ${EMSDK_PATH}/emsdk_env.sh" >> ~/.bashrc
 
 # Activate EMSDK for the current session
 RUN /bin/bash -c "source ${EMSDK_PATH}/emsdk_env.sh"
