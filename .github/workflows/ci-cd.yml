@@ -1,0 +1,137 @@
+name: CI/CI Pipeline
+
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches:
+      - main
+      - 'release/*'
+      - 'feature/*'
+      - 'bugfix/*'
+  pull_request:
+    branches:
+      - main
+      - 'release/*'
+      - 'feature/*'
+      - 'bugfix/*'
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_and_push_qt680_gcc64_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-')
+          SANITIZED_BRANCH_NAME=$(echo "$SANITIZED_BRANCH_NAME" | sed 's/-*$//')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push qt680-gcc64 image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680gcc64Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA
+          docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          # if branch is main then also push it as latest tag
+          if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }} ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest
+          fi
+
+  build_and_push_qt680_wasm_multithread_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-')
+          SANITIZED_BRANCH_NAME=$(echo "$SANITIZED_BRANCH_NAME" | sed 's/-*$//')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push qt680-wasm-multithread image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680wasmmultiDockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA
+          docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          # if branch is main then also push it as latest tag
+          if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:latest-${{ env.SANITIZED_BRANCH_NAME }} ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread:latest
+          fi
+
+  build_and_push_qt680_wasm_singlethread_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-')
+          SANITIZED_BRANCH_NAME=$(echo "$SANITIZED_BRANCH_NAME" | sed 's/-*$//')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push qt680-wasm-singlethread image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680wasmsingleDockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA
+          docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          # if branch is main then also push it as latest tag
+          if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:latest-${{ env.SANITIZED_BRANCH_NAME }} ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread:latest
+          fi
+        
