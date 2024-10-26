@@ -47,9 +47,7 @@ jobs:
 
       - name: Build and push qt680-gcc64-wasm-emsdk image
         run: |
-          docker build \
-          --build-arg QT_INSTALLER_JWT_TOKEN=${{ secrets.QT_INSTALLER_JWT_TOKEN }} \
-          -t ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680_gcc64_wasm_emsdk_Dockerfile .
+          docker build --build-arg QT_INSTALLER_JWT_TOKEN=${{ secrets.QT_INSTALLER_JWT_TOKEN }} -t ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680_gcc64_wasm_emsdk_Dockerfile .
           docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA
           docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
           docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
