@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y \
     libxcb-sync1 \
     libxcb-xfixes0 \
     libxcb-xkb1 \
+    libxcb-cursor0 \
     locales \
     && apt-get update \
     && apt-get clean \
