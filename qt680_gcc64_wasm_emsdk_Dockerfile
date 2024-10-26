@@ -49,6 +49,9 @@ ENV LC_ALL en_US.UTF-8
 # ENV QT_ACCOUNT_EMAIL=$QT_ACCOUNT_EMAIL
 # ENV QT_ACCOUNT_PASSWORD=$QT_ACCOUNT_PASSWORD
 
+ENV QT_INSTALLER_JWT_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NzExZWVlZDg3NGQ0ODAzMDA0MWMyNjciLCJlbWFpbCI6InByYXRpay5wcmFqYXBhdGkxOTg5QGdtYWlsLmNvbSIsInNjb3BlIjoidXNlciIsImV2Ijp0cnVlLCJpYXQiOjE3Mjk5MTk5OTgsImV4cCI6MTc0NTY0NDc5OCwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5xdC5pbyJ9.fAbh8cYQLMWSezw-3s3TSw6mExrYCwNEIVSMPMPXPDw
+
+
 # Download the Qt Online Installer
 RUN curl -L -o qt-installer.run "https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run" && \
     chmod +x qt-installer.run
