@@ -18,7 +18,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build_and_push_qt680_gcc64_image:
+  build_and_push_qt680_gcc64_wasm_emsdk_image:
     runs-on: ubuntu-latest
 
     steps:
