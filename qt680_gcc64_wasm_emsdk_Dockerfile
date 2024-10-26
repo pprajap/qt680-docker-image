@@ -58,7 +58,7 @@ RUN ./qt-installer.run \
     --confirm-command \
     install qt.qt6.680.linux_gcc_64 qt.qt6.680.wasm_multithread qt.qt6.680.wasm_singlethread
 
-    # Set environment variables for WebAssembly
+# Set environment variables for WebAssembly
 ENV EMSDK_VERSION=3.1.56
 ENV EMSDK_PATH=/opt/emsdk
 
