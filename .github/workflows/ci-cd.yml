@@ -18,7 +18,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build_and_push_qt680_gcc64_wasm_emsdk_image:
+  build_and_push_qt680_gcc64_image:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,16 +45,95 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push qt680-gcc64-wasm-emsdk image
+      - name: Build and push qt680-gcc64 image
         run: |
           docker build \
           --build-arg QT_INSTALLER_JWT_TOKEN=${{ secrets.QT_INSTALLER_JWT_TOKEN }} \
-          -t ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA -f qt680_gcc64_wasm_emsdk_Dockerfile .
-          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA
-          docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:${{ env.SANITIZED_BRANCH_NAME }}-$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
-          # if branch is main then also push it as latest tag
+          -t ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+          -f qt680-gcc64-Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }}
           if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
-            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }} ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest
-            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64-wasm-emsdk:latest
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+            ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-gcc64:latest
+          fi
+
+  build_and_push_qt680_wasm_multithread_emsdk_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-')
+          SANITIZED_BRANCH_NAME=$(echo "$SANITIZED_BRANCH_NAME" | sed 's/-*$//')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push qt680-wasm-multithread-emsdk image
+        run: |
+          docker build \
+          --build-arg QT_INSTALLER_JWT_TOKEN=${{ secrets.QT_INSTALLER_JWT_TOKEN }} \
+          -t ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+          -f qt680-wasm-multithread-emsdk-Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+            ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread-emsdk:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-multithread-emsdk:latest
+          fi
+
+  build_and_push_qt680_wasm_singlethread_emsdk_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | tr -c '[:alnum:]' '-')
+          SANITIZED_BRANCH_NAME=$(echo "$SANITIZED_BRANCH_NAME" | sed 's/-*$//')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push qt680-wasm-singlethread-emsdk image
+        run: |
+          docker build \
+          --build-arg QT_INSTALLER_JWT_TOKEN=${{ secrets.QT_INSTALLER_JWT_TOKEN }} \
+          -t ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+          -f qt680-wasm-singlethread-emsdk-Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }}
+          if [ "${{ env.SANITIZED_BRANCH_NAME }}" == "main" ]; then
+            docker tag ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread-emsdk:latest-${{ env.SANITIZED_BRANCH_NAME }} \
+            ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread-emsdk:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/qt680-wasm-singlethread-emsdk:latest
           fi
